@@ -1,0 +1,279 @@
+
+                //AA s_doPlugins
+                if (document.location.hostname.indexOf('qa') >= 0) {
+                    s.sa('dswsre2e')
+                }
+                if (b.tealium_environment == 'prod') {
+                    s.sa('dswsre2e');
+                    if (document.location.hostname.indexOf('csc.prod1') >= 0) {
+                        s.sa('dswcsrprod');
+                    }
+                    if (document.location.hostname.indexOf('www.dsw.com') >= 0) {
+                        s.sa('dswprod');
+                    }
+                    if (document.location.hostname.indexOf('stores.dsw.com') >= 0) {
+                        s.sa('dswprod');
+                    }
+                }
+
+                if (a == 'view' && utag_data['nav_element']) {
+                    b.sc_events = u.addEvent('event46');
+                    s.eVar51 = utag_data['nav_element'];
+		    s.eVar26 = utag_data['nav_element'];
+                    s.prop7 = 'D=v51';
+                    utag_data['nav_element'] = '';
+                }
+
+                if (b.event_name == 'product_view') {
+                    s.prop26 = b.product_productID[0];
+                    s.eVar72 = "+1";
+                }
+
+                if (b.event_name == 'product_list_view') {
+                    s.eVar4 = "D=pageName";
+                    if (utag_data['sort_type']) {
+                        b.sort_type = utag_data['sort_type'][0];
+                        utag_data['sort_type'] = ''
+                    }
+
+                }
+
+                if (b.event_name == 'onsite_search') {
+                    s.eVar73 = "+1";
+                }
+
+                if (b.event_name == 'purchase') {
+                    s.eVar61 = b.cart_total_value;
+                }
+
+                s.eVar21 = b.page_url_full;
+                if (b.page_errorURL) {
+                    s.eVar21 = b.page_errorURL;
+                }
+
+                //so that doPlugins can use the latest event name
+                utag_data['event_name'] = b.event_name = b.event_name || '';
+
+                /*
+                 * Plugin: getTimeToComplete
+                 */
+                s.getTimeToComplete = new Function("v", "cn", "e", "" +
+                    "var s=this,d=new Date,x=d,k;if(1){e=e?e:0;if(v=='start'||v=='" +
+                    "stop')s.ttcr=1;x.setTime(x.getTime()+e*86400000);if(v=='start'){s.c" +
+                    "_w(cn,d.getTime(),e?x:0);return '';}if(v=='stop'){k=s.c_r(cn);if(!s" +
+                    ".c_w(cn,'',d)||!k)return '';v=(d.getTime()-k)/1000;var td=86400,th=" +
+                    "3600,tm=60,r=5,u,un;if(v>td){u=td;un='days';}else if(v>th){u=th;un=" +
+                    "'hours';}else if(v>tm){r=2;u=tm;un='minutes';}else{r=.2;u=1;un='sec" +
+                    "onds';}v=v*r/u;return (Math.round(v)/r)+' '+un;}}return '';");
+
+
+                //time to complete checkout
+                s.gttc_c = '';
+                if (b.event_name.indexOf('cart_addition') >= 0) s.gttc_c = 'start';
+                s.eVar63 = s.getTimeToComplete(s.gttc_c, 's_gttc_c', 0);
+                if (b.event_name.indexOf('purchase') >= 0) s.gttc_c = 'stop';
+                s.eVar63 = s.getTimeToComplete(s.gttc_c, 's_gttc_c', 0);
+
+
+                function s_doPlugins(s) {
+                    s.pageURL = window.location.protocol + '//' + window.location.host + b.page_url;
+
+                    //s.prop23 = s.eVar45 = s.getPreviousValue(s.pageName, 's_ppn');
+                    //s.prop22 = s.getPercentPageViewed();
+                    if (!s.prop23 || s.prop23 == 'no value') s.prop22 = '';
+
+                    /* Plugin Example: getQueryParam 2.3 */
+                    s.campaign = s.Util.getQueryParam('cm_mmc');
+                    s.eVar25 = s.Util.getQueryParam('cm_lm');
+                    s.eVar2 = s.Util.getQueryParam('cm_re');
+
+                    /* Set Time Parting Variables (CST)*/
+                    var theDate = new Date();
+                    var currentYear = (theDate.getFullYear());
+                    s.eVar7 = s.getTimeParting('h', '-5', currentYear); // Set hour of day
+
+                    /* Plugin Example: getDaysSinceLastVisit v1.1 */
+                    s.eVar12 = s.getDaysSinceLastVisit('s_lv');
+                    s.eVar31 = '+1';
+
+                    //Product Finding Methods. https://docs.google.com/spreadsheets/d/1h110rWC9Kak_g2OeNCg9e2dqShlVxpKxLy5T_YbbPc0/edit#gid=1950217549
+                    var eventString = ',' + s.events + ',';
+					var isPdp = (eventString.indexOf(',prodView,') >= 0||eventString.indexOf(',event67,') >= 0);
+					
+                    if(eventString.indexOf(',prodView,') >= 0){
+						s.eVar65=s.eVar35=s.eVar2=s.eVar64=s.eVar10=s.eVar4=s.eVar23='';
+                    }
+                    if (s.eVar2 && s.eVar2 != "[na]") { //internal promo
+                        if (!s.products) {
+                            s.merchEvarCount('merchpromo', s.eVar2, 5)
+                        };
+                        s.eVar65 = "Internal Promo"; //Product Finding Method
+                        s.eVar35 = "[na]"; //Recommendations
+                        s.eVar2 = s.eVar2; //Internal Promotions
+                        s.eVar64 = "[na]"; //Search Term - Merchandising
+                        s.eVar10 = "[na]"; //Internal Search Type
+                        s.eVar4 = "[na]"; //Merchandising Location
+                        s.eVar23 = "[na]"; //Filter Value
+                    } else if (s.eVar64 && s.eVar64 != "[na]") { //internal search
+                        if (!s.products) {
+                            s.merchEvarCount('merchsearch', s.eVar64, 5)
+                        };
+                        s.eVar65 = "Internal Search"; //Product Finding Method
+                        s.eVar35 = "[na]"; //Recommendations
+                        s.eVar2 = "[na]"; //Internal Promotions
+                        s.eVar64 = s.eVar64; //Search Term - Merchandising
+                        s.eVar10 = s.eVar10; //Internal Search Type
+                        s.eVar4 = "[na]"; //Merchandising Location
+                        s.eVar23 = s.eVar23 || "[na]"; //Filter Value
+                    } else if (s.eVar35 && s.eVar35 != "[na]") { //recommendations
+                        s.products = s.products; //Product
+                        s.eVar65 = "Recommendations"; //Product Finding Method
+                        s.eVar35 = s.eVar35; //Recommendations
+                        s.eVar2 = "[na]"; //Internal Promotions
+                        s.eVar64 = "[na]"; //Search Term - Merchandising
+                        s.eVar10 = "[na]"; //Internal Search Type
+                        s.eVar4 = "[na]"; //Merchandising Location
+                        s.eVar23 = "[na]"; //Filter Value
+                    } else if (s.campaign && (eventString.indexOf(',event40,') >= 0 || isPdp)) { //external campaign directly to PLP or PDP
+                        s.products = s.products; //Product
+                        s.eVar65 = "External Campaign"; //Product Finding Method
+                        s.eVar35 = "[na]"; //Recommendations
+                        s.eVar2 = "[na]"; //Internal Promotions
+                        s.eVar64 = "[na]"; //Search Term - Merchandising
+                        s.eVar10 = "[na]"; //Internal Search Type
+                        s.eVar4 = "[na]"; //Merchandising Location
+                        s.eVar23 = "[na]"; //Filter Value
+                    } else if (eventString.indexOf(',event40,') >= 0) { //general browsing
+                        s.products = s.products; //Product
+                        s.eVar65 = "Browse"; //Product Finding Method
+                        s.eVar35 = "[na]"; //Recommendations
+                        s.eVar2 = "[na]"; //Internal Promotions
+                        s.eVar64 = "[na]"; //Search Term - Merchandising
+                        s.eVar10 = "[na]"; //Internal Search Type
+                        s.eVar4 = "D=pageName"; //Merchandising Location
+                        s.eVar23 = s.eVar23 || "[na]"; //Filter Value
+                    } else if (!s.setDirectOnce && !document.referrer && isPdp) { //direct traffic to PDP
+                        s.products = s.products; //Product
+                        s.eVar65 = "Direct"; //Product Finding Method
+                        s.eVar35 = "[na]"; //Recommendations
+                        s.eVar2 = "[na]"; //Internal Promotions
+                        s.eVar64 = "[na]"; //Search Term - Merchandising
+                        s.eVar10 = "[na]"; //Internal Search Type
+                        s.eVar4 = "[na]"; //Merchandising Location
+                        s.eVar23 = "[na]"; //Filter Value
+                    } else if (!s.setDirectOnce && document.referrer && document.referrer.indexOf('/www.dsw.com/')<0 && isPdp) { //referral traffic to PDP
+                        s.products = s.products; //Product
+                        s.eVar65 = "Non-Campaign Referrer"; //Product Finding Method
+                        s.eVar35 = "[na]"; //Recommendations
+                        s.eVar2 = "[na]"; //Internal Promotions
+                        s.eVar64 = "[na]"; //Search Term - Merchandising
+                        s.eVar10 = "[na]"; //Internal Search Type
+                        s.eVar4 = "[na]"; //Merchandising Location
+                        s.eVar23 = "[na]"; //Filter Value
+                    }
+                    s.setDirectOnce = true
+                    if (s.eVar65) {
+                        s.eVar3 = 'D=v65'
+                    }
+
+
+                }
+                s.doPlugins = s_doPlugins;
+
+                s.merchEvarCount = function(pfm, val, num)
+                //pmf=the product finding method name
+                //val=the specific value of the PFM for which you want a count of unique values for a dummy product string that works in connection with merchandising evars
+                //num=number of values to remember
+                {
+                    s.isNewVal = true; //assume term is new
+                    s.countVal = s.c_r('s_count' + pfm); //current count
+                    s.pastVals = s.split(s.c_r('s_stack' + pfm).toLowerCase(), '],[');
+                    //read cvp
+                    for (q = 0; q < s.pastVals.length; q++) {
+                        z = s.pastVals[q];
+                        z = s.repl(z, '[', '');
+                        z = s.repl(z, ']', '');
+                        z = s.repl(z, "'", '');
+                        s.pastVals[q] = s.split(z, ',');
+                        if (escape(val).toLowerCase() == s.pastVals[q][0]) {
+                            s.isNewVal = false;
+                            return (s.countVal - s.pastVals.length + q + 1);
+                        }
+                    }
+                    //update term count and cvp for new keywords
+                    if (s.isNewVal) {
+                        s.countVal++; //increment count
+                        s.c_w('s_count' + pfm, s.countVal, 0); //store new count
+                        //Add to cvp
+                        s.crossVisitParticipation(val, 's_stack' + pfm, '7', num, '>', '', 30); //stacked vals
+                        return s.countVal; //return product ID to be used in product string
+                    }
+                }
+
+                /*
+                 * Plugin: getPercentPageViewed v1.71
+                 */
+                s.getPercentPageViewed = new Function("n", "" +
+                    "var s=this,W=window,EL=W.addEventListener,AE=W.attachEvent,E=['load" +
+                    "','unload','scroll','resize','zoom','keyup','mouseup','touchend','o" +
+                    "rientationchange','pan'];W.s_Obj=s;s_PPVid=(n=='-'?s.pageName:n)||s" +
+                    ".pageName||location.href;if(!W.s_PPVevent){s.s_PPVg=function(n,r){v" +
+                    "ar k='s_ppv',p=k+'l',c=s.c_r(n||r?k:p),a=c.indexOf(',')>-1?c.split(" +
+                    "',',10):[''],l=a.length,i;a[0]=unescape(a[0]);r=r||(n&&n!=a[0])||0;" +
+                    "a.length=10;if(typeof a[0]!='string')a[0]='';for(i=1;i<10;i++)a[i]=" +
+                    "!r&&i<l?parseInt(a[i])||0:0;if(l<10||typeof a[9]!='string')a[9]='';" +
+                    "if(r){s.c_w(p,c);s.c_w(k,'?')}return a};W.s_PPVevent=function(e){va" +
+                    "r W=window,D=document,B=D.body,E=D.documentElement,S=window.screen|" +
+                    "|0,Ho='offsetHeight',Hs='scrollHeight',Ts='scrollTop',Wc='clientWid" +
+                    "th',Hc='clientHeight',C=100,M=Math,J='object',N='number',s=W.s_Obj|" +
+                    "|W.s||0;e=e&&typeof e==J?e.type||'':'';if(!e.indexOf('on'))e=e.subs" +
+                    "tring(2);s_PPVi=W.s_PPVi||0;if(W.s_PPVt&&!e){clearTimeout(s_PPVt);s" +
+                    "_PPVt=0;if(s_PPVi<2)s_PPVi++}if(typeof s==J){var h=M.max(B[Hs]||E[H" +
+                    "s],B[Ho]||E[Ho],B[Hc]||E[Hc]),X=W.innerWidth||E[Wc]||B[Wc]||0,Y=W.i" +
+                    "nnerHeight||E[Hc]||B[Hc]||0,x=S?S.width:0,y=S?S.height:0,r=M.round(" +
+                    "C*(W.devicePixelRatio||1))/C,b=(D.pageYOffset||E[Ts]||B[Ts]||0)+Y,p" +
+                    "=h>0&&b>0?M.round(C*b/h):0,O=W.orientation,o=!isNaN(O)?M.abs(o)%180" +
+                    ":Y>X?0:90,L=e=='load'||s_PPVi<1,a=s.s_PPVg(s_PPVid,L),V=function(i," +
+                    "v,f,n){i=parseInt(typeof a==J&&a.length>i?a[i]:'0')||0;v=typeof v!=" +
+                    "N?i:v;v=f||v>i?v:i;return n?v:v>C?C:v<0?0:v};if(new RegExp('(iPod|i" +
+                    "Pad|iPhone)').exec(navigator.userAgent||'')&&o){o=x;x=y;y=o}o=o?'P'" +
+                    ":'L';a[9]=L?'':a[9].substring(0,1);s.c_w('s_ppv',escape(W.s_PPVid)+" +
+                    "','+V(1,p,L)+','+(L||!V(2)?p:V(2))+','+V(3,b,L,1)+','+X+','+Y+','+x" +
+                    "+','+y+','+r+','+a[9]+(a[9]==o?'':o))}if(!W.s_PPVt&&e!='unload')W.s" +
+                    "_PPVt=setTimeout(W.s_PPVevent,333)};for(var f=W.s_PPVevent,i=0;i<E." +
+                    "length;i++)if(EL)EL(E[i],f,false);else if(AE)AE('on'+E[i],f);f()};v" +
+                    "ar a=s.s_PPVg();return!n||n=='-'?a[1]:a")
+
+                /*
+                 *	Plug-in: crossVisitParticipation v1.7 - stacks values from
+                 *	specified variable in cookie and returns value
+                 */
+
+                s.crossVisitParticipation = new Function("v", "cn", "ex", "ct", "dl", "ev", "dv", "" +
+                    "var s=this,ce;if(typeof(dv)==='undefined')dv=0;if(s.events&&ev){var" +
+                    " ay=s.split(ev,',');var ea=s.split(s.events,',');for(var u=0;u<ay.l" +
+                    "ength;u++){for(var x=0;x<ea.length;x++){if(ay[u]==ea[x]){ce=1;}}}}i" +
+                    "f(!v||v==''){if(ce){s.c_w(cn,'');return'';}else return'';}v=escape(" +
+                    "v);var arry=new Array(),a=new Array(),c=s.c_r(cn),g=0,h=new Array()" +
+                    ";if(c&&c!=''){arry=s.split(c,'],[');for(q=0;q<arry.length; q++){z=a" +
+                    "rry[q];z=s.repl(z,'[','');z=s.repl(z,']','');z=s.repl(z,\"'\", '');" +
+                    "arry[q] = s.split(z, ',');}}var e=new Date();e.setFullYear(e.getFul" +
+                    "lYear()+5);if(dv==0&&arry.length>0&&arry[arry.length-1][0]==v)arry[" +
+                    "arry.length-1]=[v,new Date().getTime()];else arry[arry.length]=[v,n" +
+                    "ew Date().getTime()];var start=arry.length-ct<0?0:arry.length-ct;va" +
+                    "r td=new Date();for(var x=start;x<arry.length;x++){var diff=Math.ro" +
+                    "und((td.getTime()-arry[x][1])/86400000);if(diff<ex){h[g]=unescape(a" +
+                    "rry[x][0]);a[g]=[arry[x][0],arry[x][1]];g++;}}var data=s.join(a,{de" +
+                    "lim:',',front:'[',back:']',wrap:\"'\"});s.c_w(cn,data,e);var r=s.jo" +
+                    "in(h,{delim:dl});if(ce)s.c_w(cn,'');return r;");
+
+                /*
+                 * Plugin Utility: Replace v1.0
+                 */
+                s.repl = new Function("x", "o", "n", "" +
+                    "var i=x.indexOf(o),l=n.length;while(x&&i>=0){x=x.substring(0,i)+n+x." +
+                    "substring(i+o.length);i=x.indexOf(o,i+l)}return x");
+
+
+
+            
